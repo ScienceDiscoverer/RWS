@@ -1,0 +1,1076 @@
+<!DOCTYPE html>
+<head>
+	<meta charset="utf-8">
+	<title>RWS</title>
+	<style>	
+	html, body
+	{
+		width: 100%;
+		height: 100%;
+		margin: 0px;
+		border: 0;
+		overflow: hidden; /*  Disable scrollbars */
+		display: block;  /* No floating content on sides */
+		background-color: #2b2b2b;
+		color: #b2b2b2;
+		font-family: 'GT Pressura Mono';
+	}
+	
+	.txt
+	{
+		background-color: #212121;
+		font-family: 'GT Pressura Mono';
+		width: 32px;
+		color: #C1C1C1;
+		border-width: 0;
+		border-radius: 0%;
+		text-align: center;
+	}
+	.txt:hover
+	{
+		background-color: #383838;
+	}
+	.txt:focus
+	{
+		outline: none;
+		background-color: #D8D8D8;
+		color: #111;
+	}
+	
+	.bad
+	{
+		background-color: #FF0000;
+		color: #111;
+	}
+	.bad:hover
+	{
+		background-color: #C90000;
+	}
+	.bad:focus
+	{
+		background-color: #2E0000;
+		color: #C1C1C1;
+	}
+	
+	.but
+	{
+		background-color: #111;
+		font-family: 'GT Pressura Mono';
+		font-size: 18px;
+		color: #D4D4D4;
+		border-width: 0;
+		white-space: normal;
+		width: 100px;
+		border-radius: 0%;
+	}
+	.but:hover
+	{
+		background-color: #383838;
+	}
+	.but:focus
+	{
+		outline: none;
+	}
+	
+	.prs
+	{
+		background-color: #EDEDED;
+		color: #111;
+	}
+	.prs:hover
+	{
+		background-color: #D8D8D8;
+	}
+	
+	.del
+	{
+		margin-top:2px;
+		white-space:nowrap;
+		height:40px;
+	}
+	.del:hover
+	{
+		background-color: #2E0000;
+	}
+	.prsdel
+	{
+		background-color: #FF0000;
+		color: #111;
+	}
+	.prsdel:hover
+	{
+		background-color: #C90000;
+	}
+
+	.rbut
+	{
+		display: block;
+		position: relative;
+		padding-left: 30px;
+		margin-bottom: 0px;
+		cursor: pointer;
+		-webkit-user-select: none;
+		-moz-user-select: none;
+		-ms-user-select: none;
+		user-select: none;
+	}
+	.rbut input
+	{
+		position: absolute;
+		opacity: 0;
+		cursor: pointer;
+	}
+	.rbut:focus input ~ .custrb
+	{
+		background-color: #383838;
+	}
+	.rbut input:checked ~ .custrb
+	{
+		background-color: #f2f2f2;
+	}
+	
+	.custrb
+	{
+		margin-left: 5px;
+		margin-top: 4px;
+		position: absolute;
+		top: 0;
+		left: 0;
+		height: 14px;
+		width: 14px;
+		background-color: #212121;
+		border-radius: 50%;
+	}
+	.custrb:hover
+	{
+		background-color: #383838;
+	}
+	</style>
+	
+	<script>
+	var max_val = Number.MAX_SAFE_INTEGER * -1;
+	var max_val_pad = 0;
+	var min_val = Number.MAX_SAFE_INTEGER;
+	var min_val_pad = 0;
+	
+	//var max_val = 2000;
+	//var max_val_pad = 2200;
+	//var min_val = 200;
+	//var min_val_pad = 0;
+	
+	var minus_in_data = false;
+	var x_divs = 30;
+	var x_scale = 2;
+	//var data = [422, 465, 555, 568, 722, 922, 1230, 1100, 1123, 1000, 1444];
+	
+	
+	
+var data = [ 648, 
+1889, 
+1700, 
+1547, 
+796, 
+1077, 
+2266, 
+1239, 
+1875, 
+955, 
+802, 
+545, 
+1396, 
+2079, 
+854, 
+1917, 
+2179, 
+1954, 
+1245, 
+956, 
+2089, 
+1610, 
+962, 
+877, 
+1809, 
+1519, 
+1281, 
+1723, 
+954, 
+536 ];	
+	
+	
+	
+/*var data = [ 32.6,
+34,
+20.7,
+34.8,
+-17.9,
+-21.6,
+-23.4,
+-14.8,
+-30.4,
+-15.7,
+-3.2,
+7.8,
+15.6,
+12.5,
+34.8,
+19.7,
+19.9,
+17.9,
+34,
+34.5,
+24,
+25.2,
+22.7,
+14.7,
+28.1,
+20.3,
+15.7,
+26.4,
+17.2,
+17.4 ];*/
+	
+	
+	
+	
+	
+	
+	var fil = 2.0;
+	var fil_text = 4.5;
+	var co2_high = 1000;
+	var humd_low = 30;
+	var humd_high = 50;
+	var temp_low = 20;
+	var temp_high = 27;
+	var active_chart = 0;
+	var active_scale = 1;
+	</script>
+	<link rel="icon" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAACXBIWXMAAA7DAAAOwwHHb6hkAAAAGXRFWHRTb2Z0d2FyZQB3d3cuaW5rc2NhcGUub3Jnm+48GgAAArxJREFUOI2Vkl9IU1Ecx7/ncufWwH9ti/mX3Qzupkassl56GPSH2DAfeokyIjHFh1IKaQ89hLhQyGwPCQoWMi1EalGakYqiFqbgTAb3TtdEyRxMSbDmZnedHsTrQiP6vZzDOb/fB87newj+UqIoJgJ4BEClVCrLOI5b3a2P2e3Q5/MdA+AhhKwTQr5tbGxM+Hy+gn8CKKVEFMVKSmk3IeQOz1f7eZ4vB1AN4LUgCHcppX/MkK2N3+/fJ0lSGyEkhVJ60Wi8kghcGgPqsgsLj5zIz88/a7VaD+l0ujCAy0aj8asMEAThDCGkNRgMPh0eHj6sVqtZj8fT29cnmUpLc1Q2m+28RqNRNDU1OcrKypZZlq2mlJabTKZuIoqiE8A5h8NdLwjPP7e0tLxTq9UAgHA4DIZhoFKpAADNzc11jY3RFEG47iKEtAN4xQC4oVQqzS5XxtXJSeP+YDAYkWXW1kKoqZHfy/P8KZUqumAymT4oFAozgEoGADYjkvampiYe1Gq1yq0BlmHAMtvOLBbL0Y4O682qqqpWq9X6CwDYrcuiop6HxcUXbiUlJcliI5K0I7a8vDxtbm5uyezs7HsZwHEcX1Fx7b7BYFDFN+9h2R2ASCRCu7q63iwuLr4A0MoAwNzc3Pzg4ODA8vLyz63GWCyGhEAACYEAYrGYDHC5XO0Ox+SzqampVWD7I0Xq60cf2+12a39//0cAWA2FoPV6ofV6sRoKyYCZmZkJwPIAOFkQD0gATjeMjqamud3uumg0Co1ejzWnE2tOJzR6vQzgOC4N+PIEWJ+Pk5idCegzAf2B6emX7SsrK1J6ejq7ptMt9faODWYGg99zcnJsZrM5IxqNAmi2y0ltLgsB4G0J8GMgFAotdXZ23ktOTtYPDQ01jI/bjgOfhg2GtttZWVmWkZGRnnipRBRFukP1f9RvmkwNG6+GpqYAAAAASUVORK5CYII=">
+</head>
+
+<body>
+<div style="height:100vh">
+	<canvas id='c' style='position:absolute; left:0px; top:0px;'>
+	Ooops, your browser can't into canvas... So no chart for you! =(</canvas>
+	
+	<div style='position:fixed;bottom:0;width:100%;height:200px;'>
+		<div style='float:left;margin-top:8px;margin-left:5px;'>
+			<form autocomplete="off" onsubmit="return sendWarns()">
+				<input class="txt" type="text" id="co2_warn" name="cw">
+				<label for="co2_warn">CO2</label><br>
+				<input class="txt" type="text" id="humd_warn_low" name="hwl">
+				<label for="humd_warn_low">HumdL</label><br>
+				<input class="txt" type="text" id="humd_warn_high" name="hwh">
+				<label for="humd_warn_high">HumdH</label><br>
+				<input class="txt" type="text" id="temp_warn_low" name="twl">
+				<label for="temp_warn_low">TempL </label><br>
+				<input class="txt" type="text" id="temp_warn_high" name="twh">
+				<label for="temp_warn_high">TempH</label><br>
+				<input class="but" style="margin-top:2px" type="submit" value="Update Warnings">
+			</form>
+		</div>
+		<div style='float:left;margin-top:8px;margin-left:5px;'>
+			<form onsubmit="return sendSound()">
+				<label class="rbut" for="none">None
+					<input type="radio" id="none" name="cs" value="0">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="beep">Beep
+					<input type="radio" id="beep" name="cs" value="1">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="sos">SOS
+					<input type="radio" id="sos" name="cs" value="2">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="co2">CO2
+					<input type="radio" id="co2" name="cs" value="3">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="imperial_march">Imp. March
+					<input type="radio" id="imperial_march" name="cs" value="4">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="star_trek">Star Trek
+					<input type="radio" id="star_trek" name="cs" value="5">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="doom">Doom
+					<input type="radio" id="doom" name="cs" value="6">
+					<span class="custrb"></span>
+				</label>
+				<input class="but" type="submit" style="white-space:nowrap;height:40px;width:auto" value="Change Sound">
+			</form>
+		</div>
+		<div style='float:left;margin-top:8px;margin-left:5px;'>
+			<div style="position:relative">
+			<canvas id='canvas_sd' width=100 height=100>
+			</div>
+			<div style="height:200px;position:relative;margin-top:0px;">
+				<form onsubmit="return sendDownload()" style='position:absolute;bottom:0;height:200px;'>
+				<input class="but" type="submit" style="margin-top:1px;white-space:nowrap;height:40px;" value="Download">
+				<input class="but del" onclick="sendDelete()" type="button" value="Delete">
+				</form>
+			</div>
+		</div>
+		<div style='text-align:center;font-size:47px;float:left;width:150px;margin-top:8px;margin-left:5px;'>
+			<div id="c_container">
+				<span id="co2_display">0000</span><span style="font-size:20px;">ppm</span>
+			</div>
+			<div id="h_container">
+				<span id="humd_display">00.0</span><span style="font-size:20px;">%</span>
+			</div>
+			<div id="t_container">
+				<span id="temp_display">00.0</span><span style="font-size:20px;">°C</span>
+			</div>
+		</div>
+		<div style='float:left;margin-top:8px;margin-left:5px;'>
+			<form onsubmit="return sendChartChange('sw')">
+				<label class="rbut" for="co2_chart">CO2
+					<input type="radio" id="co2_chart" name="sw" value="0" checked>
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="humd_chart">Humd
+					<input type="radio" id="humd_chart" name="sw" value="1">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="temp_chart">Temp
+					<input type="radio" id="temp_chart" name="sw" value="2">
+					<span class="custrb"></span>
+				</label>
+				<input class="but" type="submit" value="Switch Chart">
+			</form>
+		</div>
+		<div style='float:left;margin-top:8px;margin-left:5px;'>
+			<form onsubmit="return sendChartChange('sc')">
+				<label class="rbut" for="5m">5 m
+					<input type="radio" id="5m" name="sc" value="0">
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="1h">1 h
+					<input type="radio" id="1h" name="sc" value="1" checked>
+					<span class="custrb"></span>
+				</label>
+				<label class="rbut" for="1d">1 d
+					<input type="radio" id="1d" name="sc" value="2">
+					<span class="custrb"></span>
+				</label>
+				<input class="but" type="submit" value="Scale Chart">
+			</form>
+		</div>
+		<form  autocomplete="off" style='float:left;margin-top:8px;margin-left:5px;'
+		onsubmit="return sendLCDt()">
+			<input class="txt" style='width:38px' type="text" id="lcd_off" name="lf">
+			<label for="lcd_off">OFF</label><br>
+			<input class="txt" style='width:38px' type="text" id="lcd_on" name="lo">
+			<label for="lcd_on">ON</label><br>
+			<input class="but" type="submit" style="margin-top:2px;white-space:nowrap;height:40px;" value="Set LCD">
+		</form>
+	</div>
+</div>
+
+	<script>
+	const client_id = parseInt(Math.random() * 1000000) + 1;
+	const regLCD = /^\d\d:\d\d$/;
+	const reg_co2_warn = /^\d{1,4}$/;
+	const reg_h_warn = /^\d{1,3}$/;
+	const reg_t_warn = /^-?\d{1,3}$/;	
+	
+	function sendDownload()
+	{		
+		let a = document.createElement('a');
+		a.href = "/download";
+		a.setAttribute('download', '');
+		document.body.appendChild(a);
+		a.click();
+		document.body.removeChild(a);
+		return false;
+	}
+	
+	function sendDelete()
+	{		
+		if(!confirm("Are you sure that readings data file is successfully downloaded and can be deleted?"))
+		{
+			return true;
+		}
+		
+		var xhttp = new XMLHttpRequest();
+		xhttp.open("GET", "/delete", true);
+		xhttp.onreadystatechange = function ()
+		{
+			if(xhttp.readyState === XMLHttpRequest.DONE)
+			{
+				xhttp.abort();
+			}
+		}
+		xhttp.send(null);
+		return false;
+	}
+	
+	function sendChartChange(w)
+	{
+		var xhttp = new XMLHttpRequest();
+		var val = document.querySelector('input[name="' + w + '"]:checked').value;
+		xhttp.open("GET", "/?" + w + "=" + val + "&id=" + client_id, true);
+		xhttp.onreadystatechange = function ()
+		{
+			if(xhttp.readyState === XMLHttpRequest.DONE)
+			{
+				xhttp.abort();
+			}
+		}
+		xhttp.send(null);
+		return false;
+	}
+	
+	function sendSound()
+	{
+		var xhttp = new XMLHttpRequest();
+		var val = document.querySelector('input[name="cs"]:checked').value;
+		xhttp.open("GET", "/?cs=" + val, true);
+		xhttp.onreadystatechange = function ()
+		{
+			if(xhttp.readyState === XMLHttpRequest.DONE)
+			{
+				xhttp.abort();
+			}
+		}
+		xhttp.send(null);
+		return false;
+	}
+	
+	function sendWarns()
+	{	
+		var guts = [0, 0, 0, 0, 0];
+		var co2 = document.getElementById("co2_warn").value;
+		guts[0] = reg_co2_warn.test(co2) ? setTxtGood("co2_warn") : setTxtBad("co2_warn");
+		var hl = document.getElementById("humd_warn_low").value;
+		guts[1] = reg_h_warn.test(hl) ? setTxtGood("humd_warn_low") : setTxtBad("humd_warn_low");		
+		var hh = document.getElementById("humd_warn_high").value;
+		guts[2] = reg_h_warn.test(hh) ? setTxtGood("humd_warn_high") : setTxtBad("humd_warn_high");
+		var tl = document.getElementById("temp_warn_low").value;
+		guts[3] = reg_t_warn.test(tl) ? setTxtGood("temp_warn_low") : setTxtBad("temp_warn_low");
+		var th = document.getElementById("temp_warn_high").value;
+		guts[4] = reg_t_warn.test(th) ? setTxtGood("temp_warn_high") : setTxtBad("temp_warn_high");
+		
+		if(guts[0] && guts[1] && guts[2] && guts[3] && guts[4])
+		{
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("GET", "?cw="+co2+"&hwl="+hl+"&hwh="+hh+"&twl="+tl+"&twh="+th, true);
+			xhttp.onreadystatechange = function ()
+			{
+				if(xhttp.readyState === XMLHttpRequest.DONE)
+				{
+					xhttp.abort();
+				}
+			}
+			xhttp.send(null);
+		}
+		return false;
+	}
+	
+	function sendLCDt()
+	{
+		var on_gut = false, off_gut = false;
+		var on = document.getElementById("lcd_on").value;
+		if(regLCD.test(on))
+		{
+			var t = on.split(':');
+			if(parseInt(t[0]) < 24 && parseInt(t[1]) < 60)
+			{
+				on_gut = setTxtGood("lcd_on");
+			}
+		}
+		if(!on_gut)
+		{
+			setTxtBad("lcd_on");
+		}
+		
+		var off = document.getElementById("lcd_off").value;
+		if(regLCD.test(off))
+		{
+			var t = off.split(':');
+			if(parseInt(t[0]) < 24 && parseInt(t[1]) < 60)
+			{
+				off_gut = setTxtGood("lcd_off");
+			}
+		}
+		if(!off_gut)
+		{
+			setTxtBad("lcd_off");
+		}
+		
+		if(on_gut && off_gut)
+		{
+			var xhttp = new XMLHttpRequest();
+			xhttp.open("GET", "?lo="+on+"&lf="+off, true);
+			xhttp.onreadystatechange = function ()
+			{
+				if(xhttp.readyState === XMLHttpRequest.DONE)
+				{
+					xhttp.abort();
+				}
+			}
+			xhttp.send(null);
+		}
+		return false;
+	}
+	
+	var butts = document.getElementsByClassName("but");
+	const pure_but_rgx = /del/;
+	var butPress = function()
+	{
+		if(pure_but_rgx.test(this.className))
+		{
+			this.className = "but del prsdel";
+		}
+		else
+		{
+			this.className = "but prs";
+		}
+	}
+	var butRelease = function()
+	{
+		if(pure_but_rgx.test(this.className))
+		{
+			this.className = "but del";
+		}
+		else
+		{
+			this.className = "but";
+		}
+	}
+	for(var i = 0; i < butts.length; ++i)
+	{
+		butts[i].addEventListener('mousedown', butPress);
+		butts[i].addEventListener('mouseup', butRelease);
+	}
+	
+	function setChartMinMaxData()
+	{
+		max_val = Number.MAX_SAFE_INTEGER * -1;
+		max_val_pad = 0;
+		min_val = Number.MAX_SAFE_INTEGER;
+		min_val_pad = 0;
+		minus_in_data = false;
+		for(var i = 0; i < data.length; ++i)
+		{
+			if(data[i] > max_val)
+			{
+				max_val = data[i];
+			}
+			if(data[i] < min_val)
+			{
+				min_val = data[i];
+			}
+			if(data[i] < 0)
+			{
+				minus_in_data = true;
+			}
+		}
+		
+		max_val_pad = max_val + max_val * 0.1;
+		min_val_pad = min_val - max_val * 0.1;
+	}
+	
+	function setChartMinMax()
+	{
+		var last = data[data.length-1];
+		if(last > max_val)
+		{
+			max_val = last;
+			max_val_pad = max_val + max_val * 0.1;
+			min_val_pad = min_val - max_val * 0.1;
+		}
+		if(last < min_val)
+		{
+			min_val = last;
+			min_val_pad = min_val - max_val * 0.1;
+		}
+		if(last < 0)
+		{
+			minus_in_data = true;
+		}
+	}
+	
+	var chart_canvas = document.getElementById('c');
+	var chart_ctx = chart_canvas.getContext('2d');
+	initialize();
+
+	function initialize()
+	{
+		window.addEventListener('resize', resizeCanvas, false);
+		resizeCanvas();
+	}
+	
+	function redraw()
+	{
+		if(min_val == Number.MAX_SAFE_INTEGER)
+		{
+			return;
+		}
+		chart_ctx.fillStyle = '#B2B2B2';
+		chart_ctx.strokeStyle = 'E0E0E0';
+		chart_ctx.lineWidth = '2';
+		var inf_x = minus_in_data ? 65 : 50;
+		var inf_y = 20;
+		var height = window.innerHeight-200-inf_y;
+		var scale = (max_val_pad-min_val_pad)/height;
+		var x_step = (window.innerWidth-inf_x)/x_divs;
+		var x = inf_x, y = height - (data[0]-min_val_pad)/scale;
+
+		chart_ctx.lineWidth = '1';
+		chart_ctx.strokeStyle = '#333333';
+		var y_step = height/10;
+		for(var j = 1; j < 10; ++j)
+		{
+			chart_ctx.beginPath();
+			chart_ctx.moveTo(0, height - y_step * j);
+			chart_ctx.lineTo(window.innerWidth, height - y_step * j);
+			chart_ctx.stroke();
+			
+			var fsize = parseInt(y_step * 1.12);
+			fsize = fsize > 20 ? 20 : fsize;
+			
+			chart_ctx.font = fsize + 'px GT Pressura Mono';
+			chart_ctx.fillText(rnd2one((max_val_pad-min_val_pad)/10*j + min_val_pad),
+			2, height - y_step * j - 2);
+		}
+		
+		for(var i = 1; i < x_divs; ++i)
+		{
+			chart_ctx.lineWidth = '1';
+			chart_ctx.strokeStyle = '#333333';
+			chart_ctx.beginPath();
+			chart_ctx.moveTo(x+x_step,0);
+			chart_ctx.lineTo(x+x_step,height+inf_y);
+			chart_ctx.stroke();
+			
+			var font_div;
+			if(active_scale == 1)
+			{
+				font_div = 2;
+			}
+			else if(active_scale == 2)
+			{
+				font_div = 4;
+			}
+			else
+			{
+				font_div = 3;
+			}
+			fsize = parseInt(x_step/font_div * 1.55);
+			fsize = fsize > 14 ? 14 : fsize;
+			chart_ctx.font = fsize + 'px GT Pressura Mono';
+			
+			if(active_scale == 1)
+			{
+				chart_ctx.fillText((x_divs-i)*x_scale, x+x_step+2, height+inf_y-4);
+			}
+			else
+			{
+				chart_ctx.fillText(rnd2oneSmall((x_divs-i)*x_scale), x+x_step+2, height+inf_y-4);
+			}
+			
+			var x1 = x, y1 = y, x2 = x + x_step, y2 = height - (data[i]-min_val_pad)/scale;
+			var col, gc0, gc1, gc05, max, min, max_col, min_col, mid_min_col, mid_max_col, max_mid_min;
+			var gradient = false;
+			if(active_chart == 0)
+			{
+				max = co2_high;
+				min = 0;
+				max_col = '#FF0000';
+				min_col = '#0000FF';
+				mid_max_col = '#FF8080';
+				mid_min_col = '#8080FF';
+			}
+			else if(active_chart == 1)
+			{
+				max = humd_high;
+				min = humd_low;
+				max_col = '#0000FF';
+				min_col = '#FF0000';
+				mid_max_col = '#8080FF';
+				mid_min_col = '#FF8080';
+			}
+			else if(active_chart == 2)
+			{
+				max = temp_high;
+				min = temp_low;
+				max_col = '#FF0000';
+				min_col = '#0000FF';
+				mid_max_col = '#FF8080';
+				mid_min_col = '#8080FF';
+			}
+			
+			var gx1, gy1, gx2, gy2, contx, conty;
+			if(data[i-1] < max && data[i] > max)
+			{
+				if(data[i-1] < min)
+				{
+					gc0 = min_col;
+					gc05 = '#E0E0E0';
+					gc1 = max_col;
+					max_mid_min = 1;
+				}
+				else
+				{
+					gc0 = '#E0E0E0';
+					gc05 = mid_max_col;
+					gc1 = max_col;
+					max_mid_min = 0;
+				}
+				contx = x1;
+				conty = y1;
+				gx1 = 0;
+				gy1 = 0;
+				gx2 = x2 - x1;
+				gy2 = y2 - y1;
+				gradient = true;
+			}
+			else if(data[i-1] >= max && data[i] < max)
+			{
+				if(data[i] < min)
+				{
+					gc0 = max_col;
+					gc05 = '#E0E0E0';
+					gc1 = min_col;
+					max_mid_min = 1;
+				}
+				else
+				{
+					gc0 = max_col;
+					gc05 = mid_max_col;
+					gc1 = '#E0E0E0';
+					max_mid_min = 0;
+				}
+				contx = x1;
+				conty = y2;
+				gx1 = 0;
+				gy1 = y1 - y2;
+				gx2 = x2 - x1;
+				gy2 = 0;
+				gradient = true;
+			}
+			else if(data[i-1] >= max && data[i] >= max)
+			{
+				col = max_col;
+			}
+			else if(data[i-1] > min && data[i] < min)
+			{
+				if(data[i-1] > max)
+				{
+					gc0 = max_col;
+					gc05 = '#E0E0E0';
+					gc1 = min_col;
+					max_mid_min = 1;
+				}
+				else
+				{
+					gc0 = '#E0E0E0';
+					gc05 = mid_min_col;
+					gc1 = min_col;
+					max_mid_min = 2;
+				}
+				contx = x1;
+				conty = y1;
+				gx1 = 0;
+				gy1 = 0;
+				gx2 = x2 - x1;
+				gy2 = y2 - y1;
+				gradient = true;
+			}
+			else if(data[i-1] <= min && data[i] > min)
+			{
+				if(data[i] > max)
+				{
+					gc0 = min_col;
+					gc05 = '#E0E0E0';
+					gc1 = max_col;
+					max_mid_min = 1;
+				}
+				else
+				{
+					gc0 = min_col;
+					gc05 = mid_min_col;
+					gc1 = '#E0E0E0';
+					max_mid_min = 2;
+				}
+				contx = x1;
+				conty = y2;
+				gx1 = 0;
+				gy1 = y1 - y2;
+				gx2 = x2 - x1;
+				gy2 = 0;
+				gradient = true;
+			}
+			else if(data[i-1] <= min && data[i] <= min)
+			{
+				col = min_col;
+			}
+			else
+			{				
+				col = '#E0E0E0';
+			}
+			
+			if(gradient)
+			{
+				var gd = chart_ctx.createLinearGradient(gx1, gy1, gx2, gy2);
+				gd.addColorStop(0, gc0);				
+				gd.addColorStop(calcGradQ(max_mid_min, x1, y1, x2, y2, height, max, min, scale), gc05);
+				gd.addColorStop(1, gc1);
+			}
+			
+			chart_ctx.strokeStyle = col;
+			chart_ctx.lineWidth = '2';
+			chart_ctx.beginPath();
+			chart_ctx.moveTo(x,y);
+			x += x_step;
+			y = y2;
+			chart_ctx.lineTo(x,y);
+			if(gradient)
+			{
+				chart_ctx.save();
+				chart_ctx.translate(contx, conty);
+				chart_ctx.strokeStyle = gd;
+			}
+			chart_ctx.stroke();
+			if(gradient)
+			{
+				chart_ctx.restore();
+			}
+		}
+		
+		chart_ctx.strokeStyle = '#4C4C4C';
+		chart_ctx.lineWidth = '2';
+		chart_ctx.beginPath();
+		chart_ctx.moveTo(0, height);
+		chart_ctx.lineTo(window.innerWidth, height);
+		chart_ctx.stroke();
+		
+		chart_ctx.beginPath();
+		chart_ctx.moveTo(inf_x, 0);
+		chart_ctx.lineTo(inf_x, height + inf_y);
+		chart_ctx.stroke();
+	}
+
+	function resizeCanvas()
+	{
+		chart_canvas.width = window.innerWidth;
+		chart_canvas.height = window.innerHeight-200;
+		redraw();
+	}
+	
+	function totalRedraw()
+	{
+		chart_ctx.clearRect(0, 0, chart_canvas.width, chart_canvas.height);
+		redraw();
+	}
+	
+	var storage_canvas = document.getElementById('canvas_sd');
+	if (storage_canvas.getContext)
+	{
+		function redrawStorage()
+		{
+			var ctx = storage_canvas.getContext('2d');
+			ctx.clearRect(0, 0, storage_canvas.width, storage_canvas.height);
+			ctx.strokeStyle = '#212121';
+			ctx.lineWidth = '8';
+			ctx.beginPath();
+			ctx.arc(50, 50, 40, 0, Math.PI * 2, false);
+			ctx.stroke();
+			ctx.strokeStyle = '#f2f2f2';
+			ctx.beginPath();
+			ctx.arc(50, 50, 40, Math.PI * 0.5, Math.PI * (fil + 0.5), false);
+			ctx.stroke();
+			ctx.fillStyle = '#b2b2b2';
+			ctx.font = '20px GT Pressura Mono';
+			ctx.fillText(fil_text, 34, 55);
+			ctx.font = '15px GT Pressura Mono';
+			ctx.fillText("Gb", 43, 70);
+		}
+		redrawStorage();
+	}
+	
+	if(typeof(EventSource) == "undefined")
+	{
+		alert("Your browser doesn't support EventSource...");
+	}
+	else
+	{
+		var es = new EventSource("/upd?id=" + client_id);
+		
+		es.addEventListener('chart_vars', function(e)
+		{
+			var arr = e.data.split(',');
+			x_divs = parseInt(arr[0]);
+			x_scale = parseFloat(arr[1]);
+			totalRedraw();
+		});
+		
+		es.addEventListener('data', function(e)
+		{
+			data = e.data.split(',');
+			data = data.map(Number);
+			setChartMinMaxData();
+		});
+		
+		es.addEventListener('data_upd', function(e)
+		{			
+			var first = data[0];
+			data.shift();
+			data.push(parseFloat(e.data));
+			if(first == max_val || first == min_val)
+			{
+				setChartMinMaxData();
+			}
+			else
+			{
+				setChartMinMax();
+			}
+			totalRedraw();
+		});
+		
+		es.addEventListener('storage', function(e)
+		{
+			var arr = e.data.split(',');
+			fil = parseFloat(arr[0]);
+			fil_text = arr[1];
+			redrawStorage();
+		});
+		
+		es.addEventListener('warnings', function(e)
+		{
+			var arr = e.data.split(',');
+			document.getElementById("co2_warn").value = arr[0];
+			document.getElementById("humd_warn_low").value = arr[1];
+			document.getElementById("humd_warn_high").value = arr[2];
+			document.getElementById("temp_warn_low").value = arr[3];
+			document.getElementById("temp_warn_high").value = arr[4];
+			co2_high = parseInt(arr[0]);
+			humd_low = parseInt(arr[1]);
+			humd_high = parseInt(arr[2]);
+			temp_low = parseInt(arr[3]);
+			temp_high = parseInt(arr[4]);
+			totalRedraw();
+		});
+		
+		es.addEventListener('sound', function(e)
+		{
+			document.getElementById(e.data).checked = "checked";
+		});	
+		
+		es.addEventListener('readings', function(e)
+		{
+			var arr = e.data.split(',');
+			document.getElementById("co2_display").innerHTML = arr[0];
+			document.getElementById("humd_display").innerHTML = arr[1];
+			document.getElementById("temp_display").innerHTML = arr[2];
+			
+			var res = parseInt(arr[0]) > co2_high ? setRdsRed("c_container") : setRdsNorm("c_container");
+			
+			if(parseFloat(arr[1]) > humd_high) setRdsBlue("h_container");
+			else if(parseFloat(arr[1]) < humd_low) setRdsRed("h_container");
+			else setRdsNorm("h_container");
+			
+			if(parseFloat(arr[2]) > temp_high) setRdsRed("t_container");
+			else if(parseFloat(arr[2]) < temp_low) setRdsBlue("t_container");
+			else setRdsNorm("t_container");
+		});
+		
+		es.addEventListener('chart_switch', function(e)
+		{
+			document.getElementById(e.data).checked = "checked";
+			active_chart = parseInt(document.querySelector('input[name="sw"]:checked').value);
+		});
+		
+		es.addEventListener('chart_scale', function(e)
+		{
+			document.getElementById(e.data).checked = "checked";
+			active_scale = parseInt(document.querySelector('input[name="sc"]:checked').value);
+		});
+		
+		es.addEventListener('lcd_times', function(e)
+		{
+			var arr = e.data.split(',');
+			document.getElementById("lcd_on").value = arr[0];
+			document.getElementById("lcd_off").value = arr[1];
+		});
+	}
+	
+	function setTxtGood(id)
+	{
+		document.getElementById(id).className = "txt";
+		return true;
+	}
+	
+	function setTxtBad(id)
+	{
+		document.getElementById(id).className = "txt bad";
+		return false;
+	}
+	
+	function setRdsNorm(id)
+	{
+		document.getElementById(id).style.background = "#2B2B2B";
+		document.getElementById(id).style.color = "#D4D4D4";
+		return 0;
+	}
+	
+	function setRdsBlue(id)
+	{
+		document.getElementById(id).style.background = "#00F";
+		document.getElementById(id).style.color = "#111";
+		return 1;
+	}
+	
+	function setRdsRed(id)
+	{
+		document.getElementById(id).style.background = "#F00";
+		document.getElementById(id).style.color = "#111";
+		return 2;
+	}
+	
+	function rnd2one(x)
+	{
+		if(x >= 100)
+		{
+			return Math.round(x);
+		}
+		return Math.round(x * 10)/10;
+	}
+	
+	function rnd2oneSmall(x)
+	{
+		return Number(x).toFixed(1);
+	}
+	
+	function calcGradQ(max_mid_min, x1, y1, x2, y2, height, max, min, scale)
+	{
+		var slope = (y2 - y1)/(x2 - x1);
+		var yint = y1 - slope * x1;
+		var ymax = height - (max-min_val_pad)/scale;
+		var ymin = height - (min-min_val_pad)/scale;
+		var ynorm;
+		if(max_mid_min == 0)
+		{
+			ynorm = ymax;
+		}
+		else if(max_mid_min == 1)
+		{
+			ynorm = ymax + (ymin - ymax)/2;
+		}
+		else if(max_mid_min == 2)
+		{
+			ynorm = ymin;
+		}
+		var xnorm = (ynorm - yint)/slope;
+		var cath_norm1 = Math.abs(ynorm - y1), cath_norm2 = Math.abs(xnorm - x1);
+		var hypo_norm = Math.sqrt(cath_norm1 * cath_norm1 + cath_norm2 * cath_norm2);
+		var cath1 = Math.abs(y1 - y2), cath2 = Math.abs(x1 - x2);
+		var hypo = Math.sqrt(cath1 * cath1 + cath2 * cath2);
+
+		return hypo_norm/hypo;
+	}
+	</script>			
+</body> 
+</html>
