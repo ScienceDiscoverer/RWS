@@ -8,7 +8,7 @@ class SHT31D : public I2CTHSensor
 public:
 	SHT31D();
 	~SHT31D() = default;
-	void Measure();
+	int Measure();
 	void SoftReset();
 private:
 	unsigned char CheckSum(unsigned char* data);

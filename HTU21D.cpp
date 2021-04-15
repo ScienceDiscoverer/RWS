@@ -28,13 +28,13 @@ HTU21D::HTU21D()
 	}
 }
 
-void HTU21D::Measure()
+int HTU21D::Measure()
 {
 	unsigned char data[3] = {0};
 	unsigned char cmd = 0;
 	
-	temp_ = bad_value_f;
-	humd_ = bad_value_f;
+	temp_ = bad_humd_temp;
+	humd_ = bad_humd_temp;
 	
 	// Request temperature measurement
 	cmd = CMD_TEMP_MEASURE_HOLD;
@@ -42,14 +42,14 @@ void HTU21D::Measure()
 	if(fres != 1)
 	{
 		logError("HTU21D: Error writing to the I2C bus", errno);
-		return;
+		return -1;
 	}
 	
 	fres = read(i2c_fs_, data, 3);
 	if(fres != 3)
 	{
 		logError("HTU21D: Error reading from the I2C bus", errno);
-		return;
+		return -1;
 	}
 	
 	// Check for corruption
@@ -57,7 +57,7 @@ void HTU21D::Measure()
 	if(CheckSum(raw_data, data[2]))
 	{
 		logError("HTU21D: Error, recieved corrupted temperature data", 0);
-		return;
+		return -1;
 	}
 	
 	raw_data &= 0xFFFC; // Filter out 2 least significant status bits
@@ -70,26 +70,27 @@ void HTU21D::Measure()
 	if(fres != 1)
 	{
 		logError("HTU21D: Error writing to the I2C bus", errno);
-		return;
+		return -1;
 	}
 	
 	fres = read(i2c_fs_, data, 3);
 	if(fres != 3)
 	{
 		logError("HTU21D: Error reading from the I2C bus", errno);
-		return;
+		return -1;
 	}
 	
 	raw_data = data[0] << 8 | data[1];
 	if(CheckSum(raw_data, data[2]))
 	{
 		logError("HTU21D: Error, recieved corrupted humidity data", 0);
-		return;
+		return -1;
 	}
 	
 	raw_data &= 0xFFFC;
 	
 	humd_ = -6 + 125 * (float)raw_data/65536.0f;
+	return 0;
 }
 
 void HTU21D::SoftReset()

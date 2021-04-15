@@ -483,7 +483,9 @@ int spiOpenPort(int spi_device)
 
     if (*spi_fs < 0)
     {
-        logError("ILI9341: Error - Could not open SPI%d device", errno);
+        char msg[45];
+		sprintf(msg, "ILI9341: Error - Could not open SPI%d device", spi_device);
+		logError(msg, errno);
         return -1;
     }
 	

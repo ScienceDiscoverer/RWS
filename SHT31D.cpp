@@ -23,33 +23,33 @@ SHT31D::SHT31D()
 	}
 }
 
-void SHT31D::Measure()
+int SHT31D::Measure()
 {
 	unsigned char data[6] = {0};
 	
-	temp_ = bad_value_f;
-	humd_ = bad_value_f;
+	temp_ = bad_humd_temp;
+	humd_ = bad_humd_temp;
 	
 	// Request both temp and humidity measurements
 	int fres = write(i2c_fs_, &cmd_measure, 2);
 	if(fres != 2)
 	{
 		logError("SHT31D: Error writing to the I2C bus", errno);
-		return;
+		return -1;
 	}
 	
 	fres = read(i2c_fs_, data, 6);
 	if(fres != 6)
 	{
 		logError("SHT31D: Error reading from the I2C bus", errno);
-		return;
+		return -1;
 	}
 	
 	// Check for corruption	
 	if(CheckSum(data) != data[2] || CheckSum(data+3) != data[5])
 	{
 		logError("SHT31D: Error, recieved corrupted temperature or humidity data", 0);
-		return;
+		return -1;
 	}
 	
 	unsigned short raw_t = data[0] << 8 | data[1];
@@ -57,6 +57,7 @@ void SHT31D::Measure()
 
 	temp_ = -45.0f + 175.0f * (float)raw_t/65535.0f; // 2^16 - 1 = 65535
 	humd_ = 100.0f * (float)raw_h/65535.0f;
+	return 0;
 }
 
 void SHT31D::SoftReset()

@@ -84,13 +84,15 @@ Content-Length: 0\n\n";
 
 const string update_404 =
 "HTTP/1.1 404 Not Found\n\
+Connection: close\n\
 Content-Type: text/html\n\
 Content-Length: 176\n\n\
 <body style=\"background-color:#2b2b2b;color:#b2b2b2;font-family:'GT Pressura Mono'\">\
 <h1>This isn't the Page you're looking for...</h1>\
 <h2>Move along... Move along</h2></body>";
 
-const char* debug_wrts[] = { //////////DEBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBAGUUUUUUUUUUUUUUUUU!!!!!!!!!!!!!!!!!!!!!!!!
+#ifndef NDEBUG
+const char* debug_wrts[] = {
 "WRT_WARN",
 "WRT_SOUND",
 "WRT_SWITCH",
@@ -103,6 +105,7 @@ const char* debug_wrts[] = { //////////DEBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBBAGUUUUU
 "WRT_DEFAULTS",
 "WRT_UPDATE_HEAD",
 "WRT_ERROR" };
+#endif
 
 int listen_sock;
 

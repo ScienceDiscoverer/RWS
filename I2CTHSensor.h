@@ -1,14 +1,14 @@
 #ifndef I2CTHSENSOR_H
 #define I2CTHSENSOR_H
 
-const float bad_value_f = 0.0f;
+const float bad_humd_temp = -999.0f;
 
 class I2CTHSensor
 {
 public:
 	I2CTHSensor();
 	~I2CTHSensor();
-	virtual void Measure() = 0;
+	virtual int Measure() = 0;
 	virtual void SoftReset() = 0;
 	float GetTemp() const { return temp_; }
 	float GetHumd() const { return humd_; }

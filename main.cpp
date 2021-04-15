@@ -70,6 +70,7 @@ int main()
 	
 	int msec = 0;
 	int ppm = co2sens.GetPPM();
+	float humd = 0.0f, temp = 0.0f;
 	
 	unsigned int upd_period_ns = update_period_ms * 1000000;
 	struct timespec beg, end; // No Hobbits live here!
@@ -81,15 +82,29 @@ int main()
 	while(1)
 	{		
 		clock_gettime(CLOCK_MONOTONIC, &beg);
-		thsens1.Measure();
-		thsens2.Measure();
+		int th1_res = thsens1.Measure();
+		int th2_res = thsens2.Measure();
 		float h1, h2, t1, t2;
 		h1 = thsens1.GetHumd();
 		h2 = thsens2.GetHumd();
 		t1 = thsens1.GetTemp();
 		t2 = thsens2.GetTemp();
-		float humd = roundf((h1 + h2)/2.0f * 10.0f)/10.0f;
-		float temp = roundf((t1 + t2)/2.0f * 10.0f)/10.0f;
+		
+		if(th1_res == 0 && th2_res == 0)
+		{
+			humd = roundf((h1 + h2)/2.0f * 10.0f)/10.0f;
+			temp = roundf((t1 + t2)/2.0f * 10.0f)/10.0f;
+		}
+		else if(th1_res < 0 && th2_res == 0)
+		{
+			humd = h2;
+			temp = t2;
+		}
+		else if(th1_res == 0 && th2_res < 0)
+		{
+			humd = h1;
+			temp = t1;
+		}
 		
 		clock_gettime(CLOCK_MONOTONIC, &th);
 		th_wait.tv_nsec = TH_MSR_DUR - NSEC_PASSED(beg.tv_sec, th.tv_sec, beg.tv_nsec, th.tv_nsec);
@@ -100,7 +115,6 @@ int main()
 		if(msec >= 5000)
 		{
 			ppm = co2sens.GetPPM();
-			printf("ppm %d\n", ppm);
 			msec = 0;
 		}
 		
@@ -117,8 +131,7 @@ int main()
 		putWebQueue(&upd);
 		
 		if(lcd_is_on && update_allowed)
-		{			
-			printf("UPDATING LCD!!!!!!\n");
+		{
 			updateReadings(ppm, humd, temp);
 		}
 		

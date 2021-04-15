@@ -8,7 +8,7 @@ class HTU21D : public I2CTHSensor
 public:
 	HTU21D();
 	~HTU21D() = default;
-	void Measure();
+	int Measure();
 	void SoftReset();
 private:
 	unsigned char CheckSum(unsigned short sens_msg, unsigned char crc);
