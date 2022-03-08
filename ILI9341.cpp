@@ -456,6 +456,8 @@ void offLCD()
 int spiOpenPort(int spi_device)
 {
     int *spi_fs;
+	static int tries = 0;
+	tries = 0;
 
     // SPI_MODE_0 (0,0) CPOL = 0, CPHA = 0
 	// Clock idle low, data is clocked in on rising edge, output data (change) on falling edge
@@ -472,6 +474,8 @@ int spiOpenPort(int spi_device)
     	spi_fs = &spi0_fs;
 	}
 
+	jmp_retry:
+
     if (spi_device)
 	{
     	*spi_fs = open("/dev/spidev0.1", O_RDWR);
@@ -483,10 +487,13 @@ int spiOpenPort(int spi_device)
 
     if (*spi_fs < 0)
     {
-        char msg[45];
-		sprintf(msg, "ILI9341: Error - Could not open SPI%d device", spi_device);
+        char msg[80];
+		sprintf(msg, "ILI9341: Error - Could not open SPI%d device [try %d]", spi_device, tries);
 		logError(msg, errno);
-        return -1;
+		delay(1000);
+		++tries;
+		goto jmp_retry;
+        //return -1;
     }
 	
 	int res = 0;
